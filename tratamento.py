@@ -220,7 +220,7 @@ class DataTreatment:
         """Salvar dados tratados em novo CSV"""
         try:
             if output_path is None:
-                output_path = '/home/claude/Office_Sales_Treated.csv'
+                output_path = '/home/void/Documents/Estudos/classica-moveis-dados/Office Sales-Sales.csv'
             
             logger.info(f"\n=== SALVANDO DADOS ===")
             self.df.to_csv(output_path, index=False)
