@@ -3,7 +3,6 @@ import numpy as np
 from datetime import datetime
 import logging
 
-# Configurar logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
@@ -25,10 +24,10 @@ class DataTreatment:
         try:
             self.df = pd.read_csv(self.file_path)
             self.df_original = self.df.copy()
-            logger.info(f"✓ Arquivo carregado com sucesso: {self.df.shape[0]} linhas e {self.df.shape[1]} colunas")
+            logger.info(f" Arquivo carregado com sucesso: {self.df.shape[0]} linhas e {self.df.shape[1]} colunas")
             return self
         except Exception as e:
-            logger.error(f"✗ Erro ao carregar arquivo: {e}")
+            logger.error(f"Erro ao carregar arquivo: {e}")
             raise
     
     def display_info(self):
@@ -48,9 +47,9 @@ class DataTreatment:
             for col in date_columns:
                 if col in self.df.columns:
                     self.df[col] = pd.to_datetime(self.df[col])
-                    logger.info(f"✓ {col} convertida para datetime")
+                    logger.info(f"{col} convertida para datetime")
         except Exception as e:
-            logger.error(f"✗ Erro ao converter datas: {e}")
+            logger.error(f"Erro ao converter datas: {e}")
         
         return self
     
@@ -59,25 +58,23 @@ class DataTreatment:
         try:
             logger.info("\n=== CONVERTENDO TIPOS DE DADOS ===")
             
-            # Converter numéricas
             numeric_columns = ['CustomerKey', 'ProductKey', 'UnitPrice', 
                              'OrderQuantity', 'Discount %', 'ShippingCost']
             
             for col in numeric_columns:
                 if col in self.df.columns:
                     self.df[col] = pd.to_numeric(self.df[col], errors='coerce')
-                    logger.info(f"✓ {col} convertida para numérico")
+                    logger.info(f"{col} convertida para numérico")
             
-            # Converter categóricas
             categorical_columns = ['ShipMode', 'CategoryName', 'SubcategoryName', 'OrderPriority']
             
             for col in categorical_columns:
                 if col in self.df.columns:
                     self.df[col] = self.df[col].astype('category')
-                    logger.info(f"✓ {col} convertida para categoria")
+                    logger.info(f"{col} convertida para categoria")
             
         except Exception as e:
-            logger.error(f"✗ Erro ao converter tipos: {e}")
+            logger.error(f"Erro ao converter tipos: {e}")
         
         return self
     
@@ -91,20 +88,19 @@ class DataTreatment:
                 logger.info("Valores faltantes encontrados:")
                 logger.info(missing_counts[missing_counts > 0])
                 
-                # Preencher valores faltantes em colunas numéricas com a mediana
                 numeric_columns = self.df.select_dtypes(include=[np.number]).columns
                 for col in numeric_columns:
                     if self.df[col].isnull().sum() > 0:
                         median_value = self.df[col].median()
                         self.df[col].fillna(median_value, inplace=True)
-                        logger.info(f"✓ {col}: preenchidos com mediana ({median_value})")
+                        logger.info(f"{col}: preenchidos com mediana ({median_value})")
                 
-                logger.info("✓ Valores faltantes tratados")
+                logger.info("Valores faltantes tratados")
             else:
-                logger.info("✓ Nenhum valor faltante encontrado")
+                logger.info("Nenhum valor faltante encontrado")
         
         except Exception as e:
-            logger.error(f"✗ Erro ao tratar valores faltantes: {e}")
+            logger.error(f"Erro ao tratar valores faltantes: {e}")
         
         return self
     
@@ -115,17 +111,16 @@ class DataTreatment:
             
             initial_rows = len(self.df)
             
-            # Remover duplicatas completas
             self.df.drop_duplicates(inplace=True)
             
             removed = initial_rows - len(self.df)
             if removed > 0:
-                logger.info(f"✓ {removed} registros duplicados removidos")
+                logger.info(f"{removed} registros duplicados removidos")
             else:
-                logger.info("✓ Nenhuma duplicata encontrada")
+                logger.info("Nenhuma duplicata encontrada")
         
         except Exception as e:
-            logger.error(f"✗ Erro ao remover duplicatas: {e}")
+            logger.error(f"Erro ao remover duplicatas: {e}")
         
         return self
     
@@ -134,39 +129,33 @@ class DataTreatment:
         try:
             logger.info("\n=== CRIANDO COLUNAS DERIVADAS ===")
             
-            # Valor total da venda (sem desconto)
             if 'UnitPrice' in self.df.columns and 'OrderQuantity' in self.df.columns:
                 self.df['SalesValue'] = self.df['UnitPrice'] * self.df['OrderQuantity']
-                logger.info("✓ SalesValue criado (UnitPrice * OrderQuantity)")
+                logger.info("SalesValue criado (UnitPrice * OrderQuantity)")
             
-            # Valor do desconto
             if 'Discount %' in self.df.columns:
                 self.df['DiscountValue'] = self.df['SalesValue'] * (self.df['Discount %'] / 100)
-                logger.info("✓ DiscountValue criado")
+                logger.info("DiscountValue criado")
             
-            # Valor final (após desconto)
             self.df['FinalValue'] = self.df['SalesValue'] - self.df['DiscountValue']
-            logger.info("✓ FinalValue criado (SalesValue - DiscountValue)")
+            logger.info("FinalValue criado (SalesValue - DiscountValue)")
             
-            # Lucro estimado (FinalValue + ShippingCost)
             if 'ShippingCost' in self.df.columns:
                 self.df['TotalRevenue'] = self.df['FinalValue'] + self.df['ShippingCost']
-                logger.info("✓ TotalRevenue criado")
+                logger.info("TotalRevenue criado")
             
-            # Dias para entrega
             if 'OrderDate' in self.df.columns and 'DeliveryDate' in self.df.columns:
                 self.df['DeliveryDays'] = (self.df['DeliveryDate'] - self.df['OrderDate']).dt.days
-                logger.info("✓ DeliveryDays criado")
+                logger.info("DeliveryDays criado")
             
-            # Mês e Ano do pedido
             if 'OrderDate' in self.df.columns:
                 self.df['OrderMonth'] = self.df['OrderDate'].dt.month
                 self.df['OrderYear'] = self.df['OrderDate'].dt.year
                 self.df['OrderYearMonth'] = self.df['OrderDate'].dt.strftime('%Y-%m')
-                logger.info("✓ OrderMonth, OrderYear e OrderYearMonth criados")
+                logger.info("OrderMonth, OrderYear e OrderYearMonth criados")
         
         except Exception as e:
-            logger.error(f"✗ Erro ao criar colunas derivadas: {e}")
+            logger.error(f"Erro ao criar colunas derivadas: {e}")
         
         return self
     
@@ -175,7 +164,6 @@ class DataTreatment:
         try:
             logger.info("\n=== VALIDANDO DADOS ===")
             
-            # Verificar valores negativos em colunas que não devem ter
             positive_columns = ['UnitPrice', 'OrderQuantity', 'ShippingCost', 
                               'SalesValue', 'DiscountValue', 'FinalValue', 'TotalRevenue']
             
@@ -183,28 +171,26 @@ class DataTreatment:
                 if col in self.df.columns:
                     negative_count = (self.df[col] < 0).sum()
                     if negative_count > 0:
-                        logger.warning(f"⚠ {col}: {negative_count} valores negativos encontrados")
+                        logger.warning(f"{col}: {negative_count} valores negativos encontrados")
                     else:
-                        logger.info(f"✓ {col}: sem valores negativos")
+                        logger.info(f"{col}: sem valores negativos")
             
-            # Verificar valores de desconto válidos (0-100%)
             if 'Discount %' in self.df.columns:
                 invalid_discount = ((self.df['Discount %'] < 0) | (self.df['Discount %'] > 1)).sum()
                 if invalid_discount > 0:
-                    logger.warning(f"⚠ Discount %: {invalid_discount} valores inválidos (fora de 0-1)")
+                    logger.warning(f"Discount: {invalid_discount} valores inválidos (fora de 0-1)")
                 else:
-                    logger.info("✓ Discount %: valores válidos")
+                    logger.info("Discount : valores válidos")
             
-            # Verificar se delivery data >= order date
             if 'OrderDate' in self.df.columns and 'DeliveryDate' in self.df.columns:
                 invalid_dates = (self.df['DeliveryDate'] < self.df['OrderDate']).sum()
                 if invalid_dates > 0:
-                    logger.warning(f"⚠ {invalid_dates} registros com DeliveryDate < OrderDate")
+                    logger.warning(f"{invalid_dates} registros com DeliveryDate < OrderDate")
                 else:
-                    logger.info("✓ Todas as datas de entrega são posteriores aos pedidos")
+                    logger.info("Todas as datas de entrega são posteriores aos pedidos")
         
         except Exception as e:
-            logger.error(f"✗ Erro ao validar dados: {e}")
+            logger.error(f"Erro ao validar dados: {e}")
         
         return self
     
@@ -224,15 +210,14 @@ class DataTreatment:
             
             logger.info(f"\n=== SALVANDO DADOS ===")
             self.df.to_csv(output_path, index=False)
-            logger.info(f"✓ Dados tratados salvos em: {output_path}")
+            logger.info(f"Dados tratados salvos em: {output_path}")
             
-            # Salvar também em Excel para melhor visualização
             excel_path = output_path.replace('.csv', '.xlsx')
             self.df.to_excel(excel_path, index=False, sheet_name='Sales')
-            logger.info(f"✓ Dados também salvos em: {excel_path}")
+            logger.info(f"Dados também salvos em: {excel_path}")
             
         except Exception as e:
-            logger.error(f"✗ Erro ao salvar dados: {e}")
+            logger.error(f"Erro ao salvar dados: {e}")
         
         return self
     
@@ -257,7 +242,7 @@ class DataTreatment:
                 logger.info(f"\nDistribuição por Categoria:\n{self.df['CategoryName'].value_counts()}")
         
         except Exception as e:
-            logger.error(f"✗ Erro ao gerar relatório: {e}")
+            logger.error(f"Erro ao gerar relatório: {e}")
         
         return self
     
@@ -277,13 +262,10 @@ class DataTreatment:
                 .save_treated_data(output_path))
 
 
-# Script de execução
 if __name__ == "__main__":
-    # Caminho do arquivo
     input_file = '/home/void/Documents/Estudos/classica-moveis-dados/Office Sales-Sales.csv'
     output_file = '/home/void/Documents/Estudos/classica-moveis-dados/vendas-tratado.csv'
-    
-    # Executar tratamento
+
     treatment = DataTreatment(input_file)
     treatment.execute_treatment(output_file)
     

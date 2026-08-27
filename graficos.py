@@ -60,7 +60,7 @@ plt.tight_layout()
 plt.savefig('/home/void/Documents/Estudos/classica-moveis-dados/graficos/grafico_2.png', dpi=300, bbox_inches='tight')
 plt.show()
 
-# 6. Scatter: Desconto vs Receita
+# 6. Desconto vs Receita
 fig, ax = plt.subplots(figsize=(12, 6))
 scatter = ax.scatter(df['Discount %'], df['TotalRevenue'], c=df['OrderQuantity'], cmap='viridis', alpha=0.6, s=30)
 ax.set_title('Correlação: Desconto vs Receita', fontweight='bold', fontsize=14)
@@ -87,7 +87,7 @@ plt.tight_layout()
 plt.savefig('/home/void/Documents/Estudos/classica-moveis-dados/graficos/grafico_4.png', dpi=300, bbox_inches='tight')
 plt.show()
 
-# 8. Pizza: Distribuição por Prioridade
+# 8. Distribuição por Prioridade
 fig, ax = plt.subplots(figsize=(10, 8))
 priority_dist = df['OrderPriority'].value_counts()
 colors = ['#d62728', '#ff7f0e', '#2ca02c', '#1f77b4']
@@ -157,8 +157,8 @@ plt.tight_layout()
 plt.savefig('/home/void/Documents/Estudos/classica-moveis-dados/graficos/grafico_10.png', dpi=300, bbox_inches='tight')
 plt.show()
 
-print("\n✅ Todos os gráficos foram gerados com sucesso!")
-print("📊 Gráficos salvos em: /home/void/Documents/Estudos/classica-moveis-dados/graficos/")
-print("\n📁 Arquivos gerados:")
+print("\n Todos os gráficos foram gerados com sucesso!")
+print(" Gráficos salvos em: /home/void/Documents/Estudos/classica-moveis-dados/graficos/")
+print("\n Arquivos gerados:")
 for i in range(1, 11):
-    print(f"   ✓ grafico_{i}.png")
+    print(f"grafico_{i}.png")
